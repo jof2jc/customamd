@@ -16,7 +16,7 @@ frappe.query_reports["Item-wise Sales Register Test2"] = {
 			fieldname: "from_date",
 			label: __("From Date"),
 			fieldtype: "Date",
-			default: frappe.defaults.get_user_default("year_start_date"),
+			default: frappe.datetime.add_months(frappe.datetime.get_today(), -6),
 		},
 		{
 			fieldname:"to_date",
