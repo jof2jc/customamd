@@ -1,0 +1,38 @@
+[
+ {
+  "docstatus": 0, 
+  "doctype": "Custom Script", 
+  "dt": "Item", 
+  "modified": "2015-11-09 12:47:15.958318", 
+  "name": "Item-Client", 
+  "script": "frappe.ui.form.on(\"Item\", \"item_code\", function(frm) {\n       \n       var str1;\n       var str2;\n       var desc1;\n\nif (String(frm.doc.item_code) != \"\"){\n       str1 = frm.doc.item_code.toString();\n       str2 = frm.doc.item_name.toString();\n       desc1= str1 + \"<br>\" + str2;\n      //msgprint(__(str2));\n}\n       frm.set_value(\"description\", desc1);\n       \n});", 
+  "script_type": "Client"
+ }, 
+ {
+  "docstatus": 0, 
+  "doctype": "Custom Script", 
+  "dt": "Purchase Receipt", 
+  "modified": "2015-11-19 17:38:44.021864", 
+  "name": "Purchase Receipt Item-Client", 
+  "script": "frappe.ui.form.on(\"Purchase Receipt Item\", \"discount_percentage2\", function(frm, cdt, cdn) {\n    var d = locals[cdt][cdn];\n    var disc = 0;\n    disc = d.discount_percentage + (d.discount_percentage2/100 * (100 - d.discount_percentage));\n    d.rate = (100 - disc)/100 * flt(d.price_list_rate);\n    refresh_field('rate', d.name, 'items');\n\n   \n   // msgprint(d.rate);\n});\n\nfrappe.ui.form.on(\"Purchase Receipt Item\", \"discount_percentage\", function(frm, cdt, cdn) {\n    var d = locals[cdt][cdn];\n    var disc = 0;\n    disc = d.discount_percentage + (d.discount_percentage2/100 * (100 - d.discount_percentage));\n\n    msgprint(disc);\n\n    d.rate = (100 - disc)/100 * flt(d.price_list_rate);\n    //refresh_field('rate', d.name, 'items');\n\n    \n   // msgprint(d.rate);\n});\n\n", 
+  "script_type": "Client"
+ }, 
+ {
+  "docstatus": 0, 
+  "doctype": "Custom Script", 
+  "dt": "Stock Entry", 
+  "modified": "2015-11-19 20:10:55.479544", 
+  "name": "Stock Entry-Client", 
+  "script": "frappe.ui.form.on(\"Stock Entry Detail\", \"item_code\", function(frm, cdt, cdn) {\n    var d = locals[cdt][cdn];\n    var disc = 0;\n    \n    if (frm.doc.purpose == \"Material Receipt\"){\n         d.expense_account = \"Capital Stock - BE\";\n\n    }\n    \n  // msgprint(item_code);\n});", 
+  "script_type": "Client"
+ }, 
+ {
+  "docstatus": 0, 
+  "doctype": "Custom Script", 
+  "dt": "Sales Invoice", 
+  "modified": "2015-11-19 20:46:40.560721", 
+  "name": "Sales Invoice-Client", 
+  "script": "frappe.ui.form.on(\"Sales Invoice\", \"refresh\", function(frm) {\n  var ppn=\"PPN\";\n  cur_frm.set_value(\"taxes_and_charges\", ppn);\n \n});", 
+  "script_type": "Client"
+ }
+]
