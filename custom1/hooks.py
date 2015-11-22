@@ -12,7 +12,6 @@ app_version = "0.0.1"
 
 fixtures = ["Custom Field",
 "Property Setter",
-"Custom Script",
 "Print Format",
 "Report"]
 
