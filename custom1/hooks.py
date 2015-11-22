@@ -10,10 +10,7 @@ app_color = "grey"
 app_email = "jof2jc@gmail.com"
 app_version = "0.0.1"
 
-fixtures = ["Custom Field",
-"Property Setter",
-"Print Format",
-"Report"]
+fixtures = ["Report"]
 
 
 # Includes in <head>
