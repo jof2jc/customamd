@@ -131,7 +131,7 @@ def get_items_supplier(filters):
 		it.item_group, it.description,
 		si_item.qty, si_item.price_list_rate, si_item.discount_percentage, si_item.rate
 		from `tabPurchase Invoice` si, `tabPurchase Invoice Item` si_item, `tabItem` it
-		where si.name = si_item.parent and si.docstatus = 1 %s
+		where si.name = si_item.parent and si_item.item_code = it.item_code and si.docstatus = 1 %s
 		order by si.posting_date desc, si_item.item_code desc""" % conditions1, filters, as_dict=1)
         
         entries2 = frappe.db.sql("""select 'Supplier' as party_type,
