@@ -113,7 +113,7 @@ def get_items_customer(filters):
 		order by si.posting_date desc, si_item.item_code desc""" % conditions1, filters, as_dict=1)
 
         entries3 = frappe.db.sql("""select 'Customer' as party_type,
-		si.customer as party_name, 'Delivery Note' as transtype, si.name, si.transaction_date as posting_date, si_item.item_code, it.item_name,
+		si.customer as party_name, 'Sales Order' as transtype, si.name, si.transaction_date as posting_date, si_item.item_code, it.item_name,
 		it.item_group, it.description,
 		si_item.qty, si_item.price_list_rate, si_item.discount_percentage, si_item.rate
 		from `tabSales Order` si, `tabSales Order Item` si_item, `tabItem` it
