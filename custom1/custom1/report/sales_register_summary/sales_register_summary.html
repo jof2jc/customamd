@@ -1,0 +1,56 @@
+<!--<div style="margin-bottom: 7px;" class="text-center">
+	{%= frappe.boot.letter_heads[frappe.defaults.get_default("letter_head")] %}
+</div>
+-->
+
+<style>
+	.print-format table, .print-format tr, .print-format th, 
+	.print-format td, .print-format div, .print-format p {
+		font-family: Helvetica;
+                font-size: 100%;                
+		vertical-align: top;
+	}
+	
+</style>
+
+<h4 class="text-center">{%= __(report.report_name) %}</h4>
+<h5 class="text-center">
+	{%= dateutil.str_to_user(filters.from_date) %}
+	{%= __("s/d") %}
+	{%= dateutil.str_to_user(filters.to_date) %}
+</h5>
+<hr>
+<table class="table table-bordered">
+	<thead>
+		<tr>
+				<th style="width: 20%">{%= __("Invoice No") %}</th>
+				<th style="width: 15%">{%= __("Posting Date") %}</th>
+				<th style="width: 25%">{%= __("Customer") %}</th>
+				<th style="width: 20%">{%= __("Grand Total") %}</th>
+				<th style="width: 20%">{%= __("Outstanding Amount") %}</th>
+			
+		</tr>
+	</thead>
+	<tbody>
+		{% for(var i=0, l=data.length; i<l; i++) { %}
+			<tr>
+				{% if(data[i][__("Posting Date")]) { %}
+					<td>{%= data[i][__("Invoice")] %}</td>
+					<td>{%= dateutil.str_to_user(data[i][__("Posting Date")]) %}</td>
+					
+					<td>{%= data[i][__("Customer Name")] %}</td>
+					<td style="text-align: right">{%= format_currency(data[i][__("Net Total")]) %}</td>
+					<td style="text-align: right">{%= format_currency(data[i][__("Outstanding Amount")]) %}</td>
+				{% } else { %}
+					<td></td>
+					<td></td>
+					<td></td>
+				
+					<td></td>
+
+				{% } %}
+			</tr>
+		{% } %}
+	</tbody>
+</table>
+<p class="text-right text-muted">Printed On {%= dateutil.str_to_user(dateutil.get_datetime_as_string()) %}</p>

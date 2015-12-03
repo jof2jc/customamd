@@ -1,0 +1,17 @@
+{
+ "add_total_row": 1, 
+ "apply_user_permissions": 1, 
+ "creation": "2015-12-01 03:38:26.824721", 
+ "disabled": 0, 
+ "docstatus": 0, 
+ "doctype": "Report", 
+ "is_standard": "Yes", 
+ "modified": "2015-12-01 03:38:26.824721", 
+ "modified_by": "Administrator", 
+ "module": "Custom1", 
+ "name": "Sales Register Summary", 
+ "owner": "Administrator", 
+ "ref_doctype": "testdoctype", 
+ "report_name": "Sales Register Summary", 
+ "report_type": "Script Report"
+}
