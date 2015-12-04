@@ -1,7 +1,9 @@
+
 <!--<div style="margin-bottom: 7px;" class="text-center">
 	{%= frappe.boot.letter_heads[frappe.defaults.get_default("letter_head")] %}
 </div>
 -->
+<p class="text-right text-muted">Printed On {%= dateutil.str_to_user(dateutil.get_datetime_as_string()) %}</p>
 
 <style>
 	.print-format table, .print-format tr, .print-format th, 
@@ -13,6 +15,8 @@
 	
 </style>
 
+{% var sum_net_total=0; var sum_outstanding=0; %}
+<h4 class="text-center">{%= filters.company %}</h4>
 <h4 class="text-center">{%= __(report.report_name) %}</h4>
 <h5 class="text-center">
 	{%= dateutil.str_to_user(filters.from_date) %}
@@ -26,8 +30,8 @@
 				<th style="width: 20%">{%= __("Invoice No") %}</th>
 				<th style="width: 15%">{%= __("Posting Date") %}</th>
 				<th style="width: 25%">{%= __("Customer") %}</th>
-				<th style="width: 20%">{%= __("Grand Total") %}</th>
-				<th style="width: 20%">{%= __("Outstanding Amount") %}</th>
+				<th style="width: 20%; text-align: right;">{%= __("Total") %}</th>
+				<th style="width: 20%; text-align: right;">{%= __("Outstanding") %}</th>
 			
 		</tr>
 	</thead>
@@ -41,16 +45,24 @@
 					<td>{%= data[i][__("Customer Name")] %}</td>
 					<td style="text-align: right">{%= format_currency(data[i][__("Net Total")]) %}</td>
 					<td style="text-align: right">{%= format_currency(data[i][__("Outstanding Amount")]) %}</td>
-				{% } else { %}
-					<td></td>
-					<td></td>
-					<td></td>
-				
-					<td></td>
+		
+					{% sum_net_total += parseFloat(data[i][__("Net Total")]); %}
+					{% sum_outstanding += parseFloat(data[i][__("Outstanding Amount")]); %}
 
 				{% } %}
+					
+					
 			</tr>
+			
 		{% } %}
+
+			<tr>
+
+					<td colspan=3 align=right><label>Grand Total</label></td>
+					
+					<td style="text-align: right"><label>{%= format_currency(sum_net_total) %}</label></td>
+					<td style="text-align: right"><label>{%= format_currency(sum_outstanding) %}</label></td>
+				
+			</tr>
 	</tbody>
 </table>
-<p class="text-right text-muted">Printed On {%= dateutil.str_to_user(dateutil.get_datetime_as_string()) %}</p>
