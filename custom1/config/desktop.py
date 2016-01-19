@@ -116,6 +116,14 @@ def get_data():
                         "type": "Page"
 			
                 },
+		"Batch": {
+			"color": "#F57A7A",
+			"icon": "icon-truck",
+			"icon": "octicon octicon-list",
+			"label": _("Batch IDs"),
+			"link": "List/Batch",
+			"type": "List"
+                },
                 "Customer": {
 			"color": "#EB94C2",
 			"icon": "icon-truck",
