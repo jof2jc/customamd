@@ -119,7 +119,7 @@ def get_data():
 		"Batch": {
 			"color": "#F57A7A",
 			"icon": "icon-truck",
-			"icon": "octicon octicon-list",
+			"icon": "octicon octicon-git-pull-request",
 			"label": _("Batch IDs"),
 			"link": "List/Batch",
 			"type": "List"
