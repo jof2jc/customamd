@@ -11,6 +11,13 @@ frappe.query_reports["Stock Balance Summary"] = {
 			"default": frappe.defaults.get_user_default("company"),
 			"reqd": 1
 		},
+  		{
+			fieldname: "group_by",
+			label: __("Group By"),
+			fieldtype: "Select",
+			options: "Item Code\nBrand",
+			default: "Item Code"
+		},
 		{
 			"fieldname":"from_date",
 			"label": __("From Date"),

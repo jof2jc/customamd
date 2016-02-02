@@ -11,35 +11,52 @@ def execute(filters=None):
 
 	columns = get_columns(filters)
 	
-	iwb_map = get_item_warehouse_map(filters)
+	
 
 	data = []
-	for company in sorted(iwb_map):
-		for item in sorted(iwb_map[company]):
-			for wh in sorted(iwb_map[company][item]):
-				qty_dict = iwb_map[company][item][wh]
-				data.append([item, qty_dict.item_name,
-					qty_dict.item_group,
-					qty_dict.brand,
-					qty_dict.description, wh,
-					qty_dict.stock_uom, qty_dict.opening_qty,
-					qty_dict.opening_val, qty_dict.in_qty,
-					qty_dict.in_val, qty_dict.out_qty,
-					qty_dict.out_val, qty_dict.bal_qty,
-					qty_dict.bal_val, qty_dict.val_rate,
-					company
-				])
+
+	if filters.get("group_by")=="Item Code":
+		iwb_map = get_item_warehouse_map(filters)
+		for company in sorted(iwb_map):
+			for item in sorted(iwb_map[company]):
+				for wh in sorted(iwb_map[company][item]):
+					qty_dict = iwb_map[company][item][wh]
+					data.append([item, qty_dict.item_name,
+						qty_dict.item_group,
+						qty_dict.brand,
+						qty_dict.description, wh,
+						qty_dict.stock_uom, qty_dict.opening_qty,
+						qty_dict.opening_val, qty_dict.in_qty,
+						qty_dict.in_val, qty_dict.out_qty,
+						qty_dict.out_val, qty_dict.bal_qty,
+						qty_dict.bal_val, qty_dict.val_rate,
+						company
+					])
+        else:
+		entries = get_stock_ledger_entries_bybrand(filters)
+	        for d in entries:
+			data.append([
+			d.brand, d.warehouse, d.stock_uom, d.total_qty, d.value_diff, d.company
+			])
+
+	
 
 	return columns, data
 
 def get_columns(filters):
 	"""return columns based on filters"""
 
-	columns = ["Item:Link/Item:100", "Item Name::150", "Item Group::100", "Brand::90", \
-	"Description::140", "Warehouse:Link/Warehouse:100", "Stock UOM:Link/UOM:90", "Opening Qty:Float:100", \
-	"Opening Value:Float:110", "In Qty:Float:80", "In Value:Float:80", "Out Qty:Float:80", \
-	"Out Value:Float:80", "Balance Qty:Float:100", "Balance Value:Float:100", \
-	"Valuation Rate:Float:90", "Company:Link/Company:100"]
+	if filters.get("group_by")=="Item Code":
+		columns = ["Item:Link/Item:100", "Item Name::150", "Item Group::100", "Brand::90", \
+		"Description::140", "Warehouse:Link/Warehouse:100", "Stock UOM:Link/UOM:90", "Opening Qty:Float:100", \
+		"Opening Value:Float:110", "In Qty:Float:80", "In Value:Float:80", "Out Qty:Float:80", \
+		"Out Value:Float:80", "Balance Qty:Float:100", "Balance Value:Float:100", \
+		"Valuation Rate:Float:90", "Company:Link/Company:100"]
+	else:
+		columns = ["Brand:Link/Brand:90", \
+		"Warehouse:Link/Warehouse:100", "Stock UOM:Link/UOM:90", \
+		"Balance Qty:Float:100", "Balance Value:Float:100", \
+		"Company:Link/Company:100"]
 
 	return columns
 
@@ -59,8 +76,14 @@ def get_conditions(filters):
         if filters.get("company"):
 		conditions += " and sle.company = '%s'" % filters["company"]
 
+        if filters.get("warehouse"):
+		conditions += " and sle.warehouse = '%s'" % filters["warehouse"]
+
         if filters.get("brand"):
 		conditions += " and it.brand = '%s'" % filters["brand"]
+
+   	if filters.get("group_by")=="Brand":
+		conditions += " group by it.brand, it.stock_uom, sle.warehouse, sle.company order by it.brand, sle.warehouse"
 
 	return conditions
 
@@ -73,6 +96,15 @@ def get_stock_ledger_entries(filters):
 		from `tabStock Ledger Entry` sle, `tabItem` it
 		where sle.item_code = it.item_code and 
 		sle.docstatus < 2 %s order by sle.posting_date, sle.posting_time, sle.name""" %
+		conditions, as_dict=1)
+
+def get_stock_ledger_entries_bybrand(filters):
+	conditions = get_conditions(filters)
+	return frappe.db.sql("""select it.brand, it.stock_uom,
+	sle.warehouse, sle.company, sum(sle.actual_qty) as total_qty, sum(sle.stock_value_difference) as value_diff
+		from `tabStock Ledger Entry` sle, `tabItem` it
+		where sle.item_code = it.item_code and 
+		sle.docstatus < 2 %s""" %
 		conditions, as_dict=1)
 
 def get_item_warehouse_map(filters):
