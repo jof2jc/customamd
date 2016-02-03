@@ -33,13 +33,20 @@ def execute(filters=None):
 						company
 					])
         else:
-		entries = get_stock_ledger_entries_bybrand(filters)
-	        for d in entries:
-			data.append([
-			d.brand, d.warehouse, d.stock_uom, d.total_qty, d.value_diff, d.company
-			])
-
-	
+		iwb_map = get_item_warehouse_map_bybrand(filters)
+		for company in sorted(iwb_map):
+			for brand in sorted(iwb_map[company]):
+				for wh in sorted(iwb_map[company][brand]):
+					qty_dict = iwb_map[company][brand][wh]
+					data.append([qty_dict.brand,
+						wh,
+						qty_dict.stock_uom, qty_dict.opening_qty,
+						qty_dict.opening_val, qty_dict.in_qty,
+						qty_dict.in_val, qty_dict.out_qty,
+						qty_dict.out_val, qty_dict.bal_qty,
+						qty_dict.bal_val, qty_dict.val_rate,
+						company
+					])	
 
 	return columns, data
 
@@ -53,10 +60,11 @@ def get_columns(filters):
 		"Out Value:Float:80", "Balance Qty:Float:100", "Balance Value:Float:100", \
 		"Valuation Rate:Float:90", "Company:Link/Company:100"]
 	else:
-		columns = ["Brand:Link/Brand:90", \
-		"Warehouse:Link/Warehouse:100", "Stock UOM:Link/UOM:90", \
-		"Balance Qty:Float:100", "Balance Value:Float:100", \
-		"Company:Link/Company:100"]
+		columns = ["Brand::90", \
+		"Warehouse:Link/Warehouse:100", "Stock UOM:Link/UOM:90", "Opening Qty:Float:100", \
+		"Opening Value:Float:110", "In Qty:Float:80", "In Value:Float:80", "Out Qty:Float:80", \
+		"Out Value:Float:80", "Balance Qty:Float:100", "Balance Value:Float:100", \
+		"Valuation Rate:Float:90", "Company:Link/Company:100"]
 
 	return columns
 
@@ -82,8 +90,6 @@ def get_conditions(filters):
         if filters.get("brand"):
 		conditions += " and it.brand = '%s'" % filters["brand"]
 
-   	if filters.get("group_by")=="Brand":
-		conditions += " group by it.brand, it.stock_uom, sle.warehouse, sle.company order by it.brand, sle.warehouse"
 
 	return conditions
 
@@ -98,14 +104,6 @@ def get_stock_ledger_entries(filters):
 		sle.docstatus < 2 %s order by sle.posting_date, sle.posting_time, sle.name""" %
 		conditions, as_dict=1)
 
-def get_stock_ledger_entries_bybrand(filters):
-	conditions = get_conditions(filters)
-	return frappe.db.sql("""select it.brand, it.stock_uom,
-	sle.warehouse, sle.company, sum(sle.actual_qty) as total_qty, sum(sle.stock_value_difference) as value_diff
-		from `tabStock Ledger Entry` sle, `tabItem` it
-		where sle.item_code = it.item_code and 
-		sle.docstatus < 2 %s""" %
-		conditions, as_dict=1)
 
 def get_item_warehouse_map(filters):
 	sle = get_stock_ledger_entries(filters)
@@ -147,6 +145,50 @@ def get_item_warehouse_map(filters):
 				qty_dict.out_val += abs(value_diff)
 				
 		qty_dict.val_rate = d.valuation_rate
+		qty_dict.bal_qty += qty_diff 
+		qty_dict.bal_val += value_diff
+
+	return iwb_map
+
+def get_item_warehouse_map_bybrand(filters):
+	sle = get_stock_ledger_entries(filters)
+	iwb_map = {}
+
+	for d in sle:
+		iwb_map.setdefault(d.company, {}).setdefault(d.brand, {}).\
+		setdefault(d.warehouse, frappe._dict({\
+				"opening_qty": 0.0, "opening_val": 0.0,
+				"in_qty": 0.0, "in_val": 0.0,
+				"out_qty": 0.0, "out_val": 0.0,
+				"bal_qty": 0.0, "bal_val": 0.0,
+				"val_rate": 0.0, "uom": None
+			}))
+		qty_dict = iwb_map[d.company][d.brand][d.warehouse]
+
+
+ 		qty_dict.brand = d.brand
+		qty_dict.description = d.description	
+		qty_dict.stock_uom = d.stock_uom
+
+		if d.voucher_type == "Stock Reconciliation":
+			qty_diff = flt(d.qty_after_transaction) - qty_dict.bal_qty
+		else:
+			qty_diff = flt(d.actual_qty)
+
+		value_diff = flt(d.stock_value_difference)
+		
+		if d.posting_date < getdate(filters["from_date"]):
+			qty_dict.opening_qty += qty_diff
+			qty_dict.opening_val += value_diff
+		elif d.posting_date >= getdate(filters["from_date"]) and d.posting_date <= getdate(filters["to_date"]):
+			if qty_diff > 0:
+				qty_dict.in_qty += qty_diff
+				qty_dict.in_val += value_diff
+			else:
+				qty_dict.out_qty += abs(qty_diff)
+				qty_dict.out_val += abs(value_diff)
+				
+		qty_dict.val_rate += d.valuation_rate
 		qty_dict.bal_qty += qty_diff 
 		qty_dict.bal_val += value_diff
 
