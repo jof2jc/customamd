@@ -36,17 +36,18 @@ def execute(filters=None):
 		iwb_map = get_item_warehouse_map_bybrand(filters)
 		for company in sorted(iwb_map):
 			for brand in sorted(iwb_map[company]):
-				for wh in sorted(iwb_map[company][brand]):
-					qty_dict = iwb_map[company][brand][wh]
-					data.append([qty_dict.brand,
-						wh,
-						qty_dict.stock_uom, qty_dict.opening_qty,
-						qty_dict.opening_val, qty_dict.in_qty,
-						qty_dict.in_val, qty_dict.out_qty,
-						qty_dict.out_val, qty_dict.bal_qty,
-						qty_dict.bal_val, qty_dict.val_rate,
-						company
-					])	
+				for stock_uom in sorted(iwb_map[company][brand]):
+					for wh in sorted(iwb_map[company][brand][stock_uom]):
+						qty_dict = iwb_map[company][brand][stock_uom][wh]
+						data.append([qty_dict.brand,
+							wh,
+							qty_dict.stock_uom, qty_dict.opening_qty,
+							qty_dict.opening_val, qty_dict.in_qty,
+							qty_dict.in_val, qty_dict.out_qty,
+							qty_dict.out_val, qty_dict.bal_qty,
+							qty_dict.bal_val,
+							company
+						])	
 
 	return columns, data
 
@@ -64,7 +65,7 @@ def get_columns(filters):
 		"Warehouse:Link/Warehouse:100", "Stock UOM:Link/UOM:90", "Opening Qty:Float:100", \
 		"Opening Value:Float:110", "In Qty:Float:80", "In Value:Float:80", "Out Qty:Float:80", \
 		"Out Value:Float:80", "Balance Qty:Float:100", "Balance Value:Float:100", \
-		"Valuation Rate:Float:90", "Company:Link/Company:100"]
+		"Company:Link/Company:100"]
 
 	return columns
 
@@ -156,22 +157,21 @@ def get_item_warehouse_map_bybrand(filters):
 
 	for d in sle:
 		iwb_map.setdefault(d.company, {}).setdefault(d.brand, {}).\
-		setdefault(d.warehouse, frappe._dict({\
+		setdefault(d.stock_uom, {}).setdefault(d.warehouse, frappe._dict({\
 				"opening_qty": 0.0, "opening_val": 0.0,
 				"in_qty": 0.0, "in_val": 0.0,
 				"out_qty": 0.0, "out_val": 0.0,
 				"bal_qty": 0.0, "bal_val": 0.0,
-				"val_rate": 0.0, "uom": None
+				"val_rate": 0.0
 			}))
-		qty_dict = iwb_map[d.company][d.brand][d.warehouse]
+		qty_dict = iwb_map[d.company][d.brand][d.stock_uom][d.warehouse]
 
 
  		qty_dict.brand = d.brand
-		qty_dict.description = d.description	
 		qty_dict.stock_uom = d.stock_uom
 
 		if d.voucher_type == "Stock Reconciliation":
-			qty_diff = flt(d.qty_after_transaction) - qty_dict.bal_qty
+			qty_diff = flt(d.qty_after_transaction)
 		else:
 			qty_diff = flt(d.actual_qty)
 
