@@ -16,7 +16,7 @@ def get_data():
 				},
 				{
 					"type": "report",
-					"name": "Stock Balance",
+					"name": "Stock Balance Summary",
 					"doctype": "testdoctype",
 					"is_query_report": True
 				},
