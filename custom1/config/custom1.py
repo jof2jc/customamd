@@ -52,6 +52,12 @@ def get_data():
 				},
 				{
 					"type": "report",
+					"name": "General Ledger",
+					"doctype": "GL Entry",
+					"is_query_report": True
+				},
+				{
+					"type": "report",
 					"name": "Balance Sheet",
 					"doctype": "GL Entry",
 					"is_query_report": True
@@ -126,6 +132,33 @@ def get_data():
 					"name": "Customer Credit Balance",
 					"doctype": "Customer"
 				},
+			]
+		},
+		{
+			"label": _("Analytics"),
+			"icon": "icon-list",
+			"items": [
+
+				{
+					"type": "page",
+					"name": "sales-analytics",
+					"label": _("Sales Analytics"),
+					"icon": "icon-bar-chart"
+				},				
+				{
+					"type": "page",
+					"name": "purchase-analytics",
+					"label": _("Purchase Analytics"),
+					"icon": "icon-bar-chart"
+				},
+ 				{
+					"type": "report",
+					"is_query_report": True,
+					"name": "Supplier-Wise Sales Analytics",
+ 					"label": _("Sales Analytics By Supplier"),
+					"doctype": "Stock Ledger Entry"
+				}
+				                               
 			]
 		}
 		
