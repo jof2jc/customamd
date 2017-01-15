@@ -10,6 +10,12 @@ def get_data():
 			"items": [
 				{
 					"type": "report",
+					"name": "Batch-Wise Balance History",
+					"doctype": "Batch",
+					"is_query_report": True
+				},
+				{
+					"type": "report",
 					"name": "Stock Ledger Detail",
 					"doctype": "testdoctype",
 					"is_query_report": True
@@ -76,7 +82,18 @@ def get_data():
 			"icon": "icon-list",
 			"items": [
 				
-				
+				{
+					"type": "report",
+					"name": "Bank Clearance Summary",
+					"is_query_report": True,
+					"doctype": "Journal Entry"
+				},
+				{
+					"type": "report",
+					"name": "Payment Period Based On Invoice Date",
+					"is_query_report": True,
+					"doctype": "Journal Entry"
+				},
 				{
 					"type": "report",
 					"name": "Delivered Items To Be Billed",
