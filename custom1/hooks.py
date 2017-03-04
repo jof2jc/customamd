@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-app_name = "custom1"
-app_title = "Custom1"
+app_name = "customamd"
+app_title = "Customamd"
 app_publisher = "jonathan"
 app_description = "test"
 app_icon = "octicon octicon-file-directory"
